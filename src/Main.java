@@ -1,9 +1,5 @@
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.*;
 
 public class Main {
     public static void main(String... args) {
@@ -23,7 +19,7 @@ public class Main {
 
         for (int i = 0; i < 10_000_000; i++) {
 
-           CompletableFuture<String> f1 = CompletableFuture.supplyAsync(() -> {
+            CompletableFuture<String> f1 = CompletableFuture.supplyAsync(() -> {
                 safeRandomSleep(10);
                 return "S";
             }, executor);
@@ -42,14 +38,32 @@ public class Main {
                 ff.add(f1.thenApplyAsync((s) -> s, executor));
             }
 
-            Collections.shuffle(ff, ThreadLocalRandom.current());
-            CompletableFuture<Void> all = CompletableFuture.allOf(ff.toArray(new CompletableFuture[0]));
+            CompletableFuture[] ff1 = new CompletableFuture[8];
+            ff1[0] = ff.get(4);
+            ff1[1] = ff.get(7);
+            ff1[2] = ff.get(6);
+            ff1[3] = ff.get(3);
+            ff1[4] = ff.get(2);
+            ff1[5] = ff.get(1);
+            ff1[6] = ff.get(0);
+            ff1[7] = ff.get(5);
+
+            CompletableFuture<Void> all = CompletableFuture.allOf(ff1);
             all.whenComplete((aVoid, throwable) -> System.out.print("."));
 
             safeRandomSleep(10);
 
-            Collections.shuffle(ff, ThreadLocalRandom.current());
-            CompletableFuture<Void> all2 = CompletableFuture.allOf(ff.toArray(new CompletableFuture[0]));
+            CompletableFuture[] ff2 = new CompletableFuture[8];
+            ff2[0] = ff.get(6);
+            ff2[1] = ff.get(0);
+            ff2[2] = ff.get(5);
+            ff2[3] = ff.get(7);
+            ff2[4] = ff.get(2);
+            ff2[5] = ff.get(1);
+            ff2[6] = ff.get(3);
+            ff2[7] = ff.get(4);
+
+            CompletableFuture<Void> all2 = CompletableFuture.allOf(ff2);
             all2.whenComplete((aVoid, throwable) -> System.out.print("."));
 
             try {
